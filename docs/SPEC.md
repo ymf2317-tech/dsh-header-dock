@@ -13,7 +13,7 @@
 | C1 | 不改 DSH 源码（`D:\node24\node_modules\@deepseek-ai\dsh\**`），不改任何第三方插件源码（`C:\Users\Administrator\.dsh\profiles\web\node_modules\**`） | 用户既有约束；升级即丢 |
 | C2 | **绝不搬动 React 渲染出来的 DOM 节点**：不 `appendChild`/`insertBefore`/`replaceChild` 把插槽里的按钮移到别处 | React 卸载时会对自己记录的容器调 `removeChild(node)`，节点已被搬走会抛 `NotFoundError: Failed to execute 'removeChild'`，整页白屏。只允许改 `style.display`、`style.order`、`classList`、`setAttribute`，以及在容器里插入**我们自己创建**的节点 |
 | C3 | 状态完全可逆：把 localStorage 的键删掉 + 刷新页面，顶栏/侧栏必须回到原样 | 出问题要能一键回滚 |
-| C4 | **不新增顶栏按钮**。管理入口放在会话头视图页签那一行的 ⋯ 菜单（插槽 `conversation.session.header.views.actions`）里，作为一行「顶栏管理」 | 否则收纳器自己又占一格顶栏宽度，自相矛盾 |
+| C4 | **不新增顶栏按钮**。管理入口只有一个：点顶栏右上角的「»」，在抽屉末行点「管理顶栏…」。**不向**会话头视图页签的 ⋯ 菜单注册任何东西（0.2.0 起） | 否则收纳器自己又占一格顶栏宽度，自相矛盾；入口也只该有一个，免得两处行为分叉 |
 | C5 | 零构建步骤：`lib/client.js` 是浏览器直接可执行的纯 ESM/IIFE，按 `window.__ModuleLoader__.load({ id, factory })` 契约注册，`factory(require)` 里 `require('react')` | 与 `dsh-memory-guard/client.js` 同一套写法，装完硬刷即生效 |
 | C6 | 文案中文；颜色只用宿主 CSS 变量（`--dsw-alias-*`、`--dsh-*`），不写死黑白 | 跟随明暗主题 |
 | C7 | 不移除/不改动任何插件注册的插槽条目本身，只控制其可见性 | 关掉插件才该让按钮消失 |
@@ -50,6 +50,8 @@
 
 按 profile 不需要区分：同一浏览器同一站点即同一 profile。
 
+> 注：上面的 `sidebar: {collapsed, limit}` 是 0.1.4 及更早的写法。0.1.5 起侧栏改为「逐行开关」，实际结构是 `sidebar: { hiddenLabels: string[] }`（存被关掉的行标题）。**以 `README.md` 与 `lib/client.js` 的 `readStore` 为准**。
+
 ## 五、验收清单
 
 1. 390px 宽（手机）下：MEM 胶囊不再被裁——要么常显要么在「更多」里能点到。
@@ -68,3 +70,9 @@
 | `package.json` / `cordis.patch.yml` / `README.md` / `locale/*.json` | 打包与挂载元数据，照 `dsh-antigravity` 的形状写 |
 | `docs/inventory.md` | `dock-map` 的实测盘点（只读研究产出） |
 | `docs/api-notes.md` | `dock-api` 的插槽 API 契约与现成方案调研（只读研究产出） |
+
+## 七、变更记录
+
+- **0.2.0**：C4 收紧为「管理入口只在 » 抽屉内」。移除向 `conversation.session.header.views.actions` 的插槽注册（原先在视图页签 ⋯ 菜单里多一个「顶栏管理」行），同步删除 `SLOT_VIEWS` 常量与 `ManageMenuRow` 组件。属于行为变更，版本按 minor 升。
+- **0.1.5**：侧栏折叠语义从「前 N 行之后全藏」改为「逐行开关」（`sidebar.hiddenLabels`），`sidebarFold` / `sidebarLimit` 两个 config 键自此仅兼容保留。
+- **0.1.3**：插槽直接子节点不再按「是否可点」过滤，装饰节点照样参与收纳；无点击目标的条目在抽屉里渲染为「仅显示」信息行。

@@ -118,17 +118,24 @@ key = 有注册 id  →  "<slot>::<id>"            // id 来自 ctx.slots.entrie
 
 等于原位置时不写 `order`（保持 DOM 顺序，避免制造无意义的样式差异）。`applyPlan` 还会打两个标记供 DevTools 看：`data-dsh-dock-key`、`data-dsh-dock-state`（`auto` / `auto-tucked` / `always` / `more` / `hidden`）。
 
-## 6. 管理面板入口
+## 6. 管理面板入口（0.2.0 起只有一个）
 
-注册到 `conversation.session.header.views.actions`（视图页签那一行的 ⋯ 菜单），id `header-dock-manage`，order 90。**不在顶栏加按钮**（C4）。面板是原生 DOM（零构建），按 slot 分组；`onDismiss` 之类的 props 防御式取用，拿不到就自己开关。
+唯一入口：顶栏右上角「»」抽屉的**末行「管理顶栏…」**（`drawerFoot`，行在 `MoreButton` 里渲染，点击调 `openManager()`）。
 
-## 7. 侧栏折叠（F5，最终决定：默认不接管）
+- **0.2.0 移除**了原先向 `conversation.session.header.views.actions` 注册的一行「顶栏管理」，连同 `SLOT_VIEWS` 常量与 `ManageMenuRow` 组件一起删掉：两个入口会让行为分叉，用户只保留抽屉这一个。
+- 仍然**不在顶栏加按钮**（C4）：「»」触发器只在真的发生收纳时才渲染，宽屏下连节点都不存在。
+- 顶栏里唯一的注册项仍是 `conversation.session.header.utilities` 上的 `header-dock-more`（order 900）；`inject` 里的 `@deepseek-ai/dsh-client-ui-conversation` 要留着（会话头插槽属于它）。
+- 面板是原生 DOM（零构建），按 slot 分组，点遮罩 / Esc 关闭，≤640px 变底部抽屉。
 
-`dsh-sidebar-entries` 已经自带一键折叠（`nav` 首行 `button[data-dse-ui="toggle"]` + `data-dse-open`，状态存 `localStorage['dse.sidebar.collapsed.v1']`，还用自己的 MutationObserver 反复重算，并把官方 moreAnchor 用 `display:none!important` 藏了）。
+## 7. 左侧面板：逐行开关（0.1.5 起的最终形态）
 
-所以：**不重写**。代码保留但默认不跑（`config.sidebarFold:false`），且在 `sidebarForeign(nav)` 检出 `[data-dse-ui]` / `.dse-grip` / `.dse-lift-row` 时**默认让路**（上报里 `sidebar.detected:"sidebar-entries"`）；只有用户在面板里显式点「仍要强制接管」（`store.sidebar.force === true`）才压过。
+早期版本做的是「前 N 行之后全藏 + 自建『更多面板 (n)』行」，与 `dsh-sidebar-entries` 的折叠/拖动互相打架，用户反馈「折叠毫无规律」。0.1.5 推倒重来，语义收到最小：
 
-接管时也只做最小动作：对面板行写 `style.display`（绝不碰它们的子节点，`dse-grip` 的拖动依赖那些节点），并插入我们自建的「更多面板 (n)」行 —— 该行**不带 `panelRow` 类**，因为 `dsh-sidebar-entries` 认行规则是「`nav` 直接子按钮 + className 含 `panelRow`」，带上就会被它折叠/拖动接管。每次 sync 把自建行校正回 `nav.lastElementChild`，让它重渲染后自愈。
+- 管理面板列出 `nav[class*="panelList"]` 里识别到的每一行（`panelRows()` 跳过 `data-dse-ui` / `dse-grip` / `aria-haspopup`），每行一个开关；
+- 你关掉哪些行就只藏哪些行：`sidebar.hiddenLabels`（按**行标题文字**记，重渲染不错位，没标题才退回序号）；
+- 写 `style.display='none'` 且带 `!important`——`dsh-sidebar-entries` 重渲染时会覆盖普通内联样式，只有 important 盖得住；`watchSidebarNav()` 用 MutationObserver 盯住 nav，发现被改回来就再盖一次；
+- 不再插入任何自建行（旧残骸由 `removeOurSidebarRow()` 清掉），也不再按高度百分比裁切；
+- `config.sidebarFold` / `sidebarLimit` 自此仅兼容保留，不参与行为决策。
 
 ## 8. 遥测（宿主只存内存）
 
