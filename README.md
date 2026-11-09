@@ -19,7 +19,32 @@ DSH Web 的会话头里，`actions` / `utilities` / `corner` 三个插槽容器�
 
 ## 安装
 
-接线由 profile 侧完成（本包只管自己）。插件包必须放在 profile 的 `vendor/` 下并在 `package.json` 里声明为 `file:` 依赖，否则下次 `dsh plugin install` 时会被 pnpm prune 清掉：
+`<profile>` 指你的某个 profile 目录，通常在 `~/.dsh/profiles/<name>`（Windows 上是 `%USERPROFILE%\.dsh\profiles\<name>`）。
+
+### 方式 A：直接从 GitHub 装（推荐）
+
+```bash
+dsh plugin --profile <profile> add github:ymf2317-tech/dsh-header-dock
+```
+
+`dsh plugin` 只是把参数原样转发给该 profile 目录里的 pnpm，所以 `github:owner/repo`、`git+https://…`、本地 `.tgz` 都能直接用。
+
+装完还要让 DSH 知道「启动时加载它」——在 profile 的 `package.json` 里把包名加进 `dsh.profile.bundles`（数组末尾追加即可）：
+
+```jsonc
+// <profile>/package.json
+"dsh": {
+  "profile": {
+    "bundles": [ "……", "dsh-header-dock" ]
+  }
+}
+```
+
+本包的 `package.json` 已经声明了 `dsh.bundle.patch`（指向仓库里的 `cordis.patch.yml`），DSH 读 bundles 时会自动应用这段 patch，**不需要手改 profile 的 `cordis.patch.yml`**。
+
+### 方式 B：本地 vendor（离线安装 / 自己改代码时）
+
+把仓库内容放到 `<profile>/vendor/dsh-header-dock`，并声明成 `file:` 依赖，否则下次 `dsh plugin add` 时会被 pnpm prune 掉：
 
 ```jsonc
 // <profile>/package.json
@@ -28,9 +53,7 @@ DSH Web 的会话头里，`actions` / `utilities` / `corner` 三个插槽容器�
 }
 ```
 
-`<profile>` 指你的某个 profile 目录，通常在 `~/.dsh/profiles/<name>`（Windows 上是 `%USERPROFILE%\.dsh\profiles\<name>`）。
-
-再在 profile 的 `cordis.patch.yml` 里插入插件行（本包的 `cordis.patch.yml` 就是这个 `insert` 片段，`dsh.bundle.patch` 声明了它）。
+同样要进 `dsh.profile.bundles`。
 
 **装完必须硬刷一次页面**（`Ctrl+Shift+R`；手机上把该站点关掉重进 / 清一次缓存）。`lib/client.js` 是静态资源，普通刷新可能仍用旧副本，于是你会以为「装了没反应」。
 
