@@ -1,0 +1,13 @@
+# 依赖（本插件零运行时依赖，这里只是防手滑把 node_modules 提上去）
+node_modules/
+
+# 日志
+*.log
+
+# 系统垃圾文件
+.DS_Store
+Thumbs.db
+
+# internal research notes (not published)
+docs/inventory.md
+docs/api-notes.md

@@ -1,0 +1,65 @@
+{
+  "name": "dsh-header-dock",
+  "version": "0.1.9",
+  "description": "Overflow tuck-away for the DSH Web session header: a » drawer with per-item state and order.",
+  "type": "module",
+  "main": "lib/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ymf2317-tech/dsh-header-dock.git"
+  },
+  "homepage": "https://github.com/ymf2317-tech/dsh-header-dock#readme",
+  "bugs": {
+    "url": "https://github.com/ymf2317-tech/dsh-header-dock/issues"
+  },
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./locale/*.json": "./locale/*.json",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "locale",
+    "test",
+    "docs/SPEC.md",
+    "docs/IMPLEMENTATION.md",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "header",
+    "overflow",
+    "dock",
+    "toolbar"
+  ],
+  "engines": {
+    "node": ">=22.5.0",
+    "dsh": ">=0.2.2-rc.1 <0.3.0-0"
+  },
+  "author": "ymf2317-tech",
+  "license": "MIT",
+  "scripts": {
+    "test": "node test/core.test.mjs"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-locale",
+        "@deepseek-ai/dsh-client-ui-slots",
+        "@deepseek-ai/dsh-client-ui-primitives",
+        "@deepseek-ai/dsh-client-ui-conversation"
+      ]
+    },
+    "manifestVersion": 1
+  }
+}

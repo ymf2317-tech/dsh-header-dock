@@ -1,0 +1,21 @@
+# dsh-header-dock bundle patch
+# DSH 组合 profile 时按 bundles 顺序应用本文件；用户自己的 cordis.patch.yml 最后应用。
+#
+# 这个插件只有一件活：让会话页顶栏在窄屏下不再被容器裁掉。
+# 浏览器侧（lib/client.js）自己到 DOM 上找插槽容器，宿主侧只负责
+# 1) 被挂载 2) 把这里的 config 通过 /header-dock/config 递给浏览器 3) 收验收回执。
+- insert:
+    - id: header-dock
+      name: 'dsh-header-dock'
+      config:
+        # F1 自动收纳：容器装不下时从尾部收进「»」抽屉。关掉则只剩手动态生效。
+        overflow: true
+        # F5 侧栏面板折叠：默认关闭。用户左栏已被 dsh-sidebar-entries 接管拖动，
+        # 未经实测不默认动它；要开请在顶栏管理面板里手动打开（那里会写回 localStorage）。
+        sidebarFold: false
+        # 侧栏保留多少行常显（其余进「更多面板 (n)」）。
+        sidebarLimit: 6
+        # 验收回执端点（POST/GET /header-dock/report，只存内存最后一份，不落盘）。
+        reportEnabled: true
+        # 控制台细节日志。
+        debug: false
