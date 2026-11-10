@@ -21,7 +21,15 @@ DSH Web 的会话头里，`actions` / `utilities` / `corner` 三个插槽容器�
 
 `<profile>` 指你的某个 profile 目录，通常在 `~/.dsh/profiles/<name>`（Windows 上是 `%USERPROFILE%\.dsh\profiles\<name>`）。
 
-### 方式 A：直接从 GitHub 装（推荐）
+### 方式 A：从 npm 装（推荐）
+
+```bash
+dsh plugin --profile <profile> add dsh-header-dock
+```
+
+包在 <https://www.npmjs.com/package/dsh-header-dock>，零运行时依赖。
+
+### 方式 B：直接从 GitHub 装（想跟 main 最新代码时）
 
 ```bash
 dsh plugin --profile <profile> add github:ymf2317-tech/dsh-header-dock
@@ -42,7 +50,7 @@ dsh plugin --profile <profile> add github:ymf2317-tech/dsh-header-dock
 
 本包的 `package.json` 已经声明了 `dsh.bundle.patch`（指向仓库里的 `cordis.patch.yml`），DSH 读 bundles 时会自动应用这段 patch，**不需要手改 profile 的 `cordis.patch.yml`**。
 
-### 方式 B：本地 vendor（离线安装 / 自己改代码时）
+### 方式 C：本地 vendor（离线安装 / 自己改代码时）
 
 把仓库内容放到 `<profile>/vendor/dsh-header-dock`，并声明成 `file:` 依赖，否则下次 `dsh plugin add` 时会被 pnpm prune 掉：
 
