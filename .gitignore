@@ -11,3 +11,7 @@ Thumbs.db
 # internal research notes (not published)
 docs/inventory.md
 docs/api-notes.md
+
+# 本地备份（不入包、不入库）
+*.bak
+*.bak-*
