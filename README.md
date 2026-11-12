@@ -119,6 +119,8 @@ dsh plugin --profile <profile> add github:ymf2317-tech/dsh-header-dock
 
 侧栏现在的语义只有一条：管理面板里你关掉的行才藏起来（带 `display:none !important` 覆盖别人的重渲染），全开 = 原样。所以早期版本的「折叠毫无规律」问题不复存在。
 
+被其他插件**从底栏提升到左栏**的行（`dsh-rail-order` 的「底栏按钮提升」，带 `data-dse-ui="lift"`）也算用户级入口，同样会出现在管理清单里、可以逐项关掉；它们用的是 `span.dse-lift-title` 作标题，本插件会一并识别。别的插件自建的辅助行（`data-dse-ui` 为其他值）仍然不进清单。
+
 ## 上报（可选）
 
 `lib/client.js` 会在首次套用布局、每次自动收纳重算、面板改动、以及抓到本插件相关异常时，把一份布局快照 `POST /header-dock/report`。宿主只把它留在内存里（不落盘），用于排查「某个按钮为什么被收了」：
