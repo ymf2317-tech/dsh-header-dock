@@ -339,6 +339,35 @@ test('我们自建的节点（data-dsh-dock-ui）不进清单', () => {
   assert.equal(kids[0], theirs)
 })
 
+console.log('CORE.needMoreButton —— » 的自锁回归')
+
+test('宽屏 + 全部常显：tuck=0、manual=0 时 » 仍要常驻（回归 0.2.1 的自锁 bug）', () => {
+  assert.equal(
+    CORE.needMoreButton({ overflow: true, itemCount: 9, tuckCount: 0, manualCount: 0 }),
+    true,
+    '只要还有可管的项，» 就不能消失 —— 否则唯一的管理入口被自己关掉',
+  )
+})
+
+test('窄屏有项被收起时 » 当然在', () => {
+  assert.equal(CORE.needMoreButton({ overflow: true, itemCount: 9, tuckCount: 3, manualCount: 0 }), true)
+})
+
+test('顶栏一个可管项都没有（hero 页/空视图）时不出 »', () => {
+  assert.equal(CORE.needMoreButton({ overflow: true, itemCount: 0, tuckCount: 0, manualCount: 0 }), false)
+})
+
+test('overflow:false（用户关掉收纳）退回旧判据，避免 » 被挤出可视区', () => {
+  assert.equal(CORE.needMoreButton({ overflow: false, itemCount: 9, tuckCount: 0, manualCount: 0 }), false)
+  assert.equal(CORE.needMoreButton({ overflow: false, itemCount: 9, tuckCount: 2, manualCount: 0 }), true)
+  assert.equal(CORE.needMoreButton({ overflow: false, itemCount: 9, tuckCount: 0, manualCount: 1 }), true)
+})
+
+test('缺参数时按「没有项」处理，不抛错', () => {
+  assert.equal(CORE.needMoreButton(), false)
+  assert.equal(CORE.needMoreButton({}), false)
+})
+
 console.log('')
 if (process.exitCode) {
   console.error(`失败：见上面的 FAIL 行`)
